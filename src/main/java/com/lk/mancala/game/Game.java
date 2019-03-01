@@ -2,6 +2,7 @@ package com.lk.mancala.game;
 
 import com.lk.mancala.game.events.GameEndEvent;
 import com.lk.mancala.game.events.ScoredEvent;
+import com.lk.mancala.game.readmodel.GameException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -26,6 +27,7 @@ public class Game {
   }
 
   Map<String, Player> doTurn(TurnCommand turnCommand) {
+    isValidPlayer(turnCommand.getPlayerName());
     isEndOfGame();
     Player player = players.getOrDefault(turnCommand.getPlayerName(), Player.UNKNOWN_PLAYER());
 
@@ -44,6 +46,14 @@ public class Game {
     distributeStones(currentPlayerV2.removeStonesFromPit(turnCommand.getPitNumber()),
         turnCommand.getPitNumber(), true);
     return players;
+  }
+
+  private void isValidPlayer(String playerName) {
+    players.entrySet()
+            .stream()
+            .filter(entry -> entry.getKey().equals(playerName))
+            .findAny()
+            .orElseThrow(() -> GameException.invalidPlayerName(playerName));
   }
 
   private void isEndOfGame() {
@@ -81,7 +91,7 @@ public class Game {
 
   private void checkPlayerMove() {
     if (!nextPlayerV2.equals(currentPlayerV2)) {
-      throw new RuntimeException("This player already palyed !");
+      throw GameException.playerAlreadyPlayed(currentPlayerV2.getName());
     }
   }
 
