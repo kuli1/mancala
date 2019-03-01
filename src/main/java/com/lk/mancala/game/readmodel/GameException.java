@@ -13,4 +13,8 @@ public class GameException extends RuntimeException {
   public static GameException playerAlreadyPlayed(String playerName) {
     return new GameException(String.format("Player : %s already played !", playerName));
   }
+
+  public static GameException noAvailablePlayer() {
+    return new GameException("No next player available");
+  }
 }

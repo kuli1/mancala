@@ -34,7 +34,7 @@ public class Game {
     Player nextPlayer = players.entrySet()
         .stream().filter(entry -> !entry.getKey().equalsIgnoreCase(turnCommand.getPlayerName()))
         .findFirst().map(Entry::getValue)
-        .orElseThrow(() -> new RuntimeException("No Available Player !"));
+        .orElseThrow(GameException::noAvailablePlayer);
 
     currentPlayerV2 = player;
     checkPlayerMove();
@@ -114,7 +114,6 @@ public class Game {
       return;
     }
     if (numberOfStones > 0) {
-      //last stone
       addStoneToThePit(pitNumber, myBoard);
       tryToTakeOver(numberOfStones, pitNumber, myBoard);
       distributeStones(numberOfStones - 1, pitNumber, myBoard);
