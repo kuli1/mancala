@@ -1,8 +1,8 @@
 package com.lk.mancala.game;
 
 import static java.util.Comparator.*;
+import static java.util.Map.of;
 
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -14,6 +14,11 @@ class PlayerBoard {
 
   PlayerBoard(Map<Integer, Pit> board) {
     this.board = board;
+  }
+
+  static PlayerBoard standardBoard() {
+    return new PlayerBoard(of(1, Pit.defaultPit(), 2, Pit.defaultPit(), 3, Pit.defaultPit(), 4,
+        Pit.defaultPit(), 5, Pit.defaultPit(), 6, Pit.defaultPit()));
   }
 
   void addStone(int pitNmber) {
@@ -33,6 +38,11 @@ class PlayerBoard {
         == 0;
   }
 
+  int getAllStonesFromOpposite(int pitNumber) {
+    int opposite = (maxNumberOfPits() - pitNumber) + 1;
+    return removeAllAndGet(opposite);
+  }
+
   int removeAllAndGet(int pitNumber) {
     return board.get(pitNumber).removeStones();
   }
@@ -46,5 +56,9 @@ class PlayerBoard {
             pitEntry.getValue().getStonesCounter()))
         .collect(
             Collectors.joining());
+  }
+
+  int maxNumberOfPits(){
+    return board.size();
   }
 }

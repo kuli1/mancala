@@ -1,5 +1,7 @@
 package com.lk.mancala.infrastructure;
 
+import static java.util.Optional.*;
+
 import com.lk.mancala.game.Game;
 import com.lk.mancala.game.GameRepository;
 import java.util.HashMap;
@@ -12,10 +14,7 @@ class GameInMemoryRepository implements GameRepository {
   private Map<UUID, Game> games = new HashMap<>();
 
   public Optional<Game> findGameById(UUID gameId) {
-    if (games.containsKey(gameId)) {
-      return Optional.of(games.get(gameId));
-    }
-    return Optional.empty();
+    return ofNullable(games.get(gameId));
   }
 
   public Game saveGame(Game game) {

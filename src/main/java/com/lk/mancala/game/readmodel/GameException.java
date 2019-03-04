@@ -17,4 +17,8 @@ public class GameException extends RuntimeException {
   public static GameException noAvailablePlayer() {
     return new GameException("No next player available");
   }
+
+  public static GameException gameOver() {
+    return new GameException("This Game is already over");
+  }
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class GameStatsData {
+
   private Map<String, Integer> scores;
   private GameStatus gameSatus;
 
@@ -27,17 +28,19 @@ public class GameStatsData {
     return new GameStatsData(scores, GameStatus.ENDED);
   }
 
-  public GameStatsData addScores(int scoresToAdd, String player){
-    Map<String, Integer> updatedMap = scores.entrySet().stream()
+  public GameStatsData addScores(int scoresToAdd, String player) {
+    Map<String, Integer> updatedMap = scores.entrySet()
+        .stream()
         .collect(toMap(
-            Entry::getKey, o -> addScores(scoresToAdd, o.getValue(), o.getKey(),player)));
+            Entry::getKey, o -> addScores(scoresToAdd, o.getValue(), o.getKey(), player)));
 
-    return new GameStatsData(updatedMap,gameSatus);
+    return new GameStatsData(updatedMap, gameSatus);
   }
 
-  private Integer addScores(int scoresToAdd, int existingScores, String player, String playerToCompare){
-    if(playerToCompare.equals(player)){
-      return scoresToAdd+existingScores;
+  private Integer addScores(int scoresToAdd, int existingScores, String player,
+      String playerToCompare) {
+    if (playerToCompare.equals(player)) {
+      return scoresToAdd + existingScores;
     }
     return existingScores;
   }

@@ -28,6 +28,10 @@ class Pit {
     return new Pit(0);
   }
 
+  static Pit defaultPit(){
+    return new Pit(6);
+  }
+
   public int removeStones() {
     int currentVal = stonesCounter;
     stonesCounter = 0;

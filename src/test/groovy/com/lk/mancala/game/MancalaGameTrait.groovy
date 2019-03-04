@@ -21,7 +21,7 @@ trait MancalaGameTrait {
 
     Game thereIsGameSetup(String player1Name, String player2Name, Map<Integer, Pit> playerOneBoard, Map<Integer, Pit> playerTwoBoard){
         def (Player player1, Player player2) = setupPlayers(playerOneBoard, playerTwoBoard, player1Name, player2Name)
-        return new Game(of(player1.getName(), player1, player2.getName(), player2), player1, new TestGameEventPropagator())
+        return new Game(of(player1.getName(), player1, player2.getName(), player2), player1, 6, new TestGameEventPropagator())
     }
 
     private List setupPlayers(Map<Integer, Pit> playerOneBoard, Map<Integer, Pit> playerTwoBoard, String player1Name, String player2Name) {

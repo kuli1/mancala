@@ -9,9 +9,9 @@ public class ScoredEvent {
   private UUID gameId;
 
 
-  public ScoredEvent(String playerName, int i, UUID gameId) {
+  public ScoredEvent(String playerName, int scoreToAdd, UUID gameId) {
       this.playerName = playerName;
-      this.scoresToAdd = i;
+      this.scoresToAdd = scoreToAdd;
       this.gameId = gameId;
   }
 

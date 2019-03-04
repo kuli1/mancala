@@ -9,70 +9,48 @@ import java.util.UUID;
 
 public class Game {
 
-  static final int PITS_MAX_NUMBER = 6;
   private Map<String, Player> players;
   private UUID gameId;
-  private Player currentPlayerV2;
-  private Player nextPlayerV2;
+  private Player currentPlayer;
+  private Player nextPlayer;
   private boolean endOfGame;
+  private final int maxPitNumber;
   private GameEvents gameEvents;
 
   public Game(Map<String, Player> players,
-      Player startingPlayer, GameEvents gameEvents) {
+      Player startingPlayer, int maxPitNumber, GameEvents gameEvents) {
     this.players = players;
-    currentPlayerV2 = startingPlayer;
-    nextPlayerV2 = startingPlayer;
+    currentPlayer = startingPlayer;
+    nextPlayer = startingPlayer;
+    this.maxPitNumber = maxPitNumber;
     gameId = UUID.randomUUID();
     this.gameEvents = gameEvents;
   }
 
   Map<String, Player> doTurn(TurnCommand turnCommand) {
+    isGameActive();
     isValidPlayer(turnCommand.getPlayerName());
-    isEndOfGame();
-    Player player = players.getOrDefault(turnCommand.getPlayerName(), Player.UNKNOWN_PLAYER());
-
-    Player nextPlayer = players.entrySet()
-        .stream().filter(entry -> !entry.getKey().equalsIgnoreCase(turnCommand.getPlayerName()))
-        .findFirst().map(Entry::getValue)
-        .orElseThrow(GameException::noAvailablePlayer);
-
-    currentPlayerV2 = player;
+    setPlayer(turnCommand);
     checkPlayerMove();
-    nextPlayerV2 = nextPlayer;
-    if (checkIfEndOfGame()) {
+    setNexPlayer(turnCommand);
+    if (isMovePossible()) {
       gameEvents.emit(new GameEndEvent(gameId));
       return players;
     }
-    distributeStones(currentPlayerV2.removeStonesFromPit(turnCommand.getPitNumber()),
-        turnCommand.getPitNumber(), true);
+    finishTurn(turnCommand);
     return players;
   }
 
-  private void isValidPlayer(String playerName) {
-    players.entrySet()
-            .stream()
-            .filter(entry -> entry.getKey().equals(playerName))
-            .findAny()
-            .orElseThrow(() -> GameException.invalidPlayerName(playerName));
-  }
-
-  private void isEndOfGame() {
-    if (endOfGame) {
-      gameEvents.emit(new GameEndEvent(gameId));
-      throw new RuntimeException("This Game is already over !");
-    }
-  }
-
-  public int getScores(String playerName) {
+  int getScores(String playerName) {
     return players.getOrDefault(playerName, Player.UNKNOWN_PLAYER())
         .getScore();
   }
 
-  public String whichPlayerTurn() {
-    return currentPlayerV2.getName();
+  String whichPlayerTurn() {
+    return currentPlayer.getName();
   }
 
-  public int playerStonesInPit(String playerName, int pit) {
+  int playerStonesInPit(String playerName, int pit) {
     return players.getOrDefault(playerName, Player.UNKNOWN_PLAYER())
         .getStonesCountForPit(pit);
   }
@@ -81,17 +59,52 @@ public class Game {
     return gameId;
   }
 
-  private boolean checkIfEndOfGame() {
-    if (currentPlayerV2.cantmove()) {
-      nextPlayerV2.collectAllStones();
+  private void finishTurn(TurnCommand turnCommand) {
+    distributeStones(currentPlayer.removeStonesFromPit(turnCommand.getPitNumber()),
+        turnCommand.getPitNumber(), true);
+  }
+
+  private void setPlayer(TurnCommand turnCommand) {
+    Player player = players.getOrDefault(turnCommand.getPlayerName(), Player.UNKNOWN_PLAYER());
+    this.currentPlayer = player;
+  }
+
+  private void setNexPlayer(TurnCommand turnCommand) {
+    Player nextPlayer = getNextPlayer(turnCommand);
+    this.nextPlayer = nextPlayer;
+  }
+
+  private Player getNextPlayer(TurnCommand turnCommand) {
+    return players.entrySet()
+        .stream().filter(entry -> !entry.getKey().equalsIgnoreCase(turnCommand.getPlayerName()))
+        .findFirst().map(Entry::getValue)
+        .orElseThrow(GameException::noAvailablePlayer);
+  }
+
+  private void isValidPlayer(String playerName) {
+    if(!players.containsKey(playerName)){
+      throw GameException.invalidPlayerName(playerName);
+    }
+  }
+
+  private void isGameActive() {
+    if (endOfGame) {
+      throw GameException.gameOver();
+    }
+  }
+
+  private boolean isMovePossible() {
+    if (currentPlayer.cantmove()) {
+      endOfGame = true;
+      nextPlayer.collectAllStones();
       return true;
     }
     return false;
   }
 
   private void checkPlayerMove() {
-    if (!nextPlayerV2.equals(currentPlayerV2)) {
-      throw GameException.playerAlreadyPlayed(currentPlayerV2.getName());
+    if (!nextPlayer.equals(currentPlayer)) {
+      throw GameException.playerAlreadyPlayed(currentPlayer.getName());
     }
   }
 
@@ -99,12 +112,16 @@ public class Game {
 
     pitNumber = pitNumber + 1;
 
-    if (pitNumber > PITS_MAX_NUMBER && numberOfStones > 0) {
+    if (numberOfStones == 0) {
+      return;
+    }
+
+    if (pitNumber > maxPitNumber && numberOfStones > 0) {
       if (myBoard) {
-        currentPlayerV2.addScore();
-        gameEvents.emit(new ScoredEvent(currentPlayerV2.getName(), 1, gameId));
+        currentPlayer.addScore();
+        gameEvents.emit(new ScoredEvent(currentPlayer.getName(), 1, gameId));
         if (numberOfStones == 1) {
-          nextPlayerV2 = currentPlayerV2;
+          nextPlayer = currentPlayer;
           return;
         }
         distributeStones(numberOfStones - 1, 0, false);
@@ -120,24 +137,21 @@ public class Game {
       return;
     }
 
-    if (numberOfStones == 0) {
-      return;
-    }
   }
 
   private void addStoneToThePit(int pitNumber, boolean myBoard) {
     if (myBoard) {
-      currentPlayerV2.addStoneToPit(pitNumber);
+      currentPlayer.addStoneToPit(pitNumber);
     } else {
-      nextPlayerV2.addStoneToPit(pitNumber);
+      nextPlayer.addStoneToPit(pitNumber);
     }
   }
 
   private void tryToTakeOver(int numberOfStones, int pitNumber, boolean myBoard) {
     if (takeOverPossible(numberOfStones, myBoard)) {
-      int stonesToRemove = nextPlayerV2.removeAllStonesFromOppositePitAndGet(pitNumber);
-      currentPlayerV2.addScore(stonesToRemove);
-      gameEvents.emit(new ScoredEvent(currentPlayerV2.getName(), stonesToRemove, gameId));
+      int stonesToRemove = nextPlayer.removeAllStonesFromOppositePitAndGet(pitNumber);
+      currentPlayer.addScore(stonesToRemove);
+      gameEvents.emit(new ScoredEvent(currentPlayer.getName(), stonesToRemove, gameId));
     }
   }
 

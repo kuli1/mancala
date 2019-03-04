@@ -7,7 +7,6 @@ class Player {
   private String name;
   private int score;
   private PlayerBoard playerBoard;
-  static final int PITS_MAX_NUMBER = 6;
 
   Player(String name, PlayerBoard playerBoard) {
     this.name = name;
@@ -49,8 +48,7 @@ class Player {
   }
 
   int removeAllStonesFromOppositePitAndGet(int pitNumber) {
-    int opposite = (PITS_MAX_NUMBER - pitNumber) + 1;
-    return playerBoard.removeAllAndGet(opposite);
+    return playerBoard.getAllStonesFromOpposite(pitNumber);
   }
 
   @Override

@@ -135,5 +135,4 @@ class DataStructureSpec extends Specification implements MancalaGameTrait {
 
     }
 
-
 }
