@@ -3,7 +3,7 @@ package com.lk.mancala.game;
 import static com.lk.mancala.game.PlayerBoard.*;
 import static java.util.Map.*;
 
-import com.lk.mancala.game.events.GameStartedEvent;
+import com.lk.mancala.game.events.GameStarted;
 
 public class GameFactory {
 
@@ -19,7 +19,7 @@ public class GameFactory {
     Player player2 = new Player(player2Name, standardBoard());
     Game game = new Game(of(player1.getName(), player1, player2.getName(), player2), player1,
         standardBoard().maxNumberOfPits(), gameEvents);
-    gameEvents.emit(new GameStartedEvent(game.gemeId(), player1Name, player2Name));
+    gameEvents.emit(new GameStarted(game.gemeId(), player1Name, player2Name));
     return game;
   }
 

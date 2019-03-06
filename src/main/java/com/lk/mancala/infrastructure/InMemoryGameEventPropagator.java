@@ -1,10 +1,10 @@
 package com.lk.mancala.infrastructure;
 
-import com.lk.mancala.game.events.GameEndEvent;
+import com.lk.mancala.game.events.GameEnded;
 import com.lk.mancala.game.GameEvents;
-import com.lk.mancala.game.events.ScoredEvent;
-import com.lk.mancala.game.events.GameStartedEvent;
-import com.lk.mancala.game.events.TurnDoneEvent;
+import com.lk.mancala.game.events.PointsScored;
+import com.lk.mancala.game.events.GameStarted;
+import com.lk.mancala.game.events.TurnDone;
 import com.lk.mancala.game.readmodel.GameStatsData;
 import com.lk.mancala.game.readmodel.GameStatsRepository;
 import com.lk.mancala.game.readmodel.GameStatus;
@@ -20,32 +20,32 @@ public class InMemoryGameEventPropagator implements GameEvents {
   }
 
   @Override
-  public void emit(GameStartedEvent gameStartedEvent) {
+  public void emit(GameStarted gameStarted) {
 
     GameStatsData newGameData = new GameStatsData(
-        Map.of(gameStartedEvent.getPlayer1Name(), 0, gameStartedEvent.getPlayer2Name(), 0),
+        Map.of(gameStarted.getPlayer1Name(), 0, gameStarted.getPlayer2Name(), 0),
         GameStatus.STARTED);
-    gameStatsRepository.updateGameStats(gameStartedEvent.getGameId(), newGameData);
+    gameStatsRepository.updateGameStats(gameStarted.getGameId(), newGameData);
   }
 
   @Override
-  public void emit(TurnDoneEvent turnDoneEvent) {
+  public void emit(TurnDone turnDone) {
 
   }
 
   @Override
-  public void emit(GameEndEvent gameEndEvent) {
-    GameStatsData gameStatsData = gameStatsRepository.readGameStats(gameEndEvent.getGameId());
+  public void emit(GameEnded gameEnded) {
+    GameStatsData gameStatsData = gameStatsRepository.readGameStats(gameEnded.getGameId());
     GameStatsData endedGame = gameStatsData.endGame();
-    gameStatsRepository.updateGameStats(gameEndEvent.getGameId(), endedGame);
+    gameStatsRepository.updateGameStats(gameEnded.getGameId(), endedGame);
   }
 
   @Override
-  public void emit(ScoredEvent scoredEvent) {
-    GameStatsData gameStatsData = gameStatsRepository.readGameStats(scoredEvent.getGameId());
+  public void emit(PointsScored pointsScored) {
+    GameStatsData gameStatsData = gameStatsRepository.readGameStats(pointsScored.getGameId());
     GameStatsData newGameStats = gameStatsData
-        .addScores(scoredEvent.getScoresToAdd(), scoredEvent.getPlayerName());
+        .addScores(pointsScored.getScoresToAdd(), pointsScored.getPlayerName());
 
-    gameStatsRepository.updateGameStats(scoredEvent.getGameId(), newGameStats);
+    gameStatsRepository.updateGameStats(pointsScored.getGameId(), newGameStats);
   }
 }

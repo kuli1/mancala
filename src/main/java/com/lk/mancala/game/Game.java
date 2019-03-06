@@ -1,7 +1,7 @@
 package com.lk.mancala.game;
 
-import com.lk.mancala.game.events.GameEndEvent;
-import com.lk.mancala.game.events.ScoredEvent;
+import com.lk.mancala.game.events.GameEnded;
+import com.lk.mancala.game.events.PointsScored;
 import com.lk.mancala.game.readmodel.GameException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,7 +34,7 @@ public class Game {
     checkPlayerMove();
     setNexPlayer(turnCommand);
     if (isMovePossible()) {
-      gameEvents.emit(new GameEndEvent(gameId));
+      gameEvents.emit(new GameEnded(gameId));
       return players;
     }
     finishTurn(turnCommand);
@@ -119,7 +119,7 @@ public class Game {
     if (pitNumber > maxPitNumber && numberOfStones > 0) {
       if (myBoard) {
         currentPlayer.addScore();
-        gameEvents.emit(new ScoredEvent(currentPlayer.getName(), 1, gameId));
+        gameEvents.emit(new PointsScored(currentPlayer.getName(), 1, gameId));
         if (numberOfStones == 1) {
           nextPlayer = currentPlayer;
           return;
@@ -151,7 +151,7 @@ public class Game {
     if (takeOverPossible(numberOfStones, myBoard)) {
       int stonesToRemove = nextPlayer.removeAllStonesFromOppositePitAndGet(pitNumber);
       currentPlayer.addScore(stonesToRemove);
-      gameEvents.emit(new ScoredEvent(currentPlayer.getName(), stonesToRemove, gameId));
+      gameEvents.emit(new PointsScored(currentPlayer.getName(), stonesToRemove, gameId));
     }
   }
 

@@ -1,15 +1,15 @@
 package com.lk.mancala.game;
 
-import com.lk.mancala.game.events.GameEndEvent;
-import com.lk.mancala.game.events.GameStartedEvent;
-import com.lk.mancala.game.events.ScoredEvent;
-import com.lk.mancala.game.events.TurnDoneEvent;
+import com.lk.mancala.game.events.GameEnded;
+import com.lk.mancala.game.events.GameStarted;
+import com.lk.mancala.game.events.PointsScored;
+import com.lk.mancala.game.events.TurnDone;
 
 public interface GameEvents {
 
-  void emit(GameStartedEvent gameStartedEvent);
-  void emit(TurnDoneEvent turnDoneEvent);
-  void emit(GameEndEvent gameEndEvent);
-  void emit(ScoredEvent scoredEvent);
+  void emit(GameStarted gameStarted);
+  void emit(TurnDone turnDone);
+  void emit(GameEnded gameEnded);
+  void emit(PointsScored pointsScored);
 
 }

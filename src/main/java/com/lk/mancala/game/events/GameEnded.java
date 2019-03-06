@@ -2,11 +2,11 @@ package com.lk.mancala.game.events;
 
 import java.util.UUID;
 
-public class GameEndEvent {
+public class GameEnded {
 
   UUID gameId;
 
-  public GameEndEvent(UUID gameId) {
+  public GameEnded(UUID gameId) {
     this.gameId = gameId;
   }
 

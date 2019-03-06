@@ -1,9 +1,9 @@
 package com.lk.mancala.game
 
-import com.lk.mancala.game.events.GameEndEvent
-import com.lk.mancala.game.events.GameStartedEvent
-import com.lk.mancala.game.events.ScoredEvent
-import com.lk.mancala.game.events.TurnDoneEvent
+import com.lk.mancala.game.events.GameEnded
+import com.lk.mancala.game.events.GameStarted
+import com.lk.mancala.game.events.PointsScored
+import com.lk.mancala.game.events.TurnDone
 
 import static java.util.Map.*
 
@@ -34,22 +34,22 @@ trait MancalaGameTrait {
 
     private static class TestGameEventPropagator implements GameEvents{
         @Override
-        void emit(GameStartedEvent gameStartedEvent) {
+        void emit(GameStarted gameStartedEvent) {
 
         }
 
         @Override
-        void emit(TurnDoneEvent turnDoneEvent) {
+        void emit(TurnDone turnDoneEvent) {
 
         }
 
         @Override
-        void emit(GameEndEvent gameEndEvent) {
+        void emit(GameEnded gameEndEvent) {
 
         }
 
         @Override
-        void emit(ScoredEvent scoredEvent) {
+        void emit(PointsScored scoredEvent) {
 
         }
     }
